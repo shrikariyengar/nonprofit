@@ -51,7 +51,7 @@ def run_kitter(csv_path = "inventory.csv", box_volume_limit = 15):
         problem += items[item_name] <= row["max_per_box"] * Boxes, f"Max_Per_Box{item_name}"
 
     #Finally, Step 3, solving the problem
-    stats = problem.solve()
+    stats = problem.solve(pulp.HiGHS(msg = False))
     status_label = getattr(getattr(stats, "status", stats), "name", str(stats))
     has_solution = getattr(stats, "has_solution", status_label == "Optimal")
     print("Optimization Results")
