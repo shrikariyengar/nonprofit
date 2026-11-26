@@ -1,0 +1,5 @@
+#size_units in terms of 1-5 
+item_id, category, quantity_available, size_units, min_per_box, max_per_box
+Beans, Protein, 150, 4, 2, 5
+Lentil, Nutrients, 100, 5, 10, 20
+Tomato, Fruit, 10, 1, 4, 5
