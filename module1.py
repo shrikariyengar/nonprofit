@@ -9,6 +9,37 @@ from geopy.geocoders import Nominatim
 
 #OR-tools needs to keep fractional miles
 SCALE = 10000
+#Geocoding Function (Converting Addresses to Latitudes and Longitudes)
+def geocode_addresses(df):
+    if "address" not in df.columns:
+        return df
+    geolocator = Nominatim(user_agent = "community_logistics_optimizer_v1")
+    latitudes = []
+    longitude = []
+    for idx, row in df.iterrows():
+        lat = row.get("latitude")
+        lon = row.get("longitude")
+        if (
+            pd.isna(lat)
+            or pd.isna(lon)
+            or (isinstance(lat, str) and not lat.strip())
+        ):
+            address = row.get("address")
+            if pd.notna(address) and str(address).strip():
+                try:
+                    loc = geolocator.geocode(str(address))
+                    if loc:
+                        lat, long = loc.latitude, loc.longitude
+                    else:
+                        lat, long = 0.0, 0.0
+                    time.sleep(1.1)
+                except Exception:
+                    lat, lon = 0.0, 0.0
+            latitudes.append(float(lat) if pd.notna(lat) else 0.0)
+            longitude.append(float(lat) if pd.notna(lat) else 0.0)
+    df["latitude"] = latitudes
+    df["longitude"] = longitude
+    return df
 #Bundles all the rules and matrix into the function create_model
 def create_model(csv_path = "stops.csv", num_vehicles = 1, vehicle_capacity = 5):
     data = {}
@@ -21,12 +52,18 @@ def create_model(csv_path = "stops.csv", num_vehicles = 1, vehicle_capacity = 5)
         raise ValueError(
             f"Stops CSV is missing required columns. Needs: {required}"
         )
+    df = geocode_addresses(df)
+    if "latitude" not in df.columns or "longitude" not in df.columns:
+        raise ValueError(
+            "Stops CSV must either include latitude/longitude or an address column."
+        )
 
-    data["demands"] = df["Demand"].tolist()
+
+    data["demands"] = df["demand"].tolist()
 
     #Extract the latitude and longitude for distances
-    latitudes = df["Latitude"].values
-    longitudes = df["Longitude"].values
+    latitudes = df["latitude"].values
+    longitudes = df["longitude"].values
 
     #Create coordinate array for calculation
     coords = np.column_stack((latitudes, longitudes))
@@ -50,8 +87,8 @@ def create_model(csv_path = "stops.csv", num_vehicles = 1, vehicle_capacity = 5)
 def plot_route(df, all_routes, output_path = "route_map.html"):
     #Get the coordinates of the starting depot (first stop)
     depot_idx = all_routes[0][0]
-    depot_lat = df.loc[depot_idx, "Latitude"]
-    depot_lon = df.loc[depot_idx, "Longitude"]
+    depot_lat = df.loc[depot_idx, "latitude"]
+    depot_lon = df.loc[depot_idx, "longitude"]
 
     #Initalize folium map (centered around the first place - depot)
     route_map = folium.Map(location=[depot_lat, depot_lon], zoom_start = 15, tiles = "Esri.WorldStreetMap")
@@ -63,10 +100,10 @@ def plot_route(df, all_routes, output_path = "route_map.html"):
         line_color = colors[v_id % len(colors)]
         #Loop through all the stops in the optimized route
         for idx in route_indices:
-            lat = df.loc[idx, "Latitude"]
-            lon = df.loc[idx, "Longitude"]
-            name = df.loc[idx, "Location_Name"]
-            demand = df.loc[idx, "Demand"]
+            lat = df.loc[idx, "latitude"]
+            lon = df.loc[idx, "longitude"]
+            name = df.loc[idx, "location_name"] if "location_name" in df.columns else f"Stop {idx}"
+            demand = df.loc[idx, "demand"]
 
             route_coords.append([lat, lon])
             #Colors the depot marker blue and the delivery as red
@@ -193,9 +230,9 @@ def run_routing(csv_path = "stops.csv", num_vehicles = 1, vehicle_capacity = 5, 
 
             print(planned_output)
             print("-" * 20)
-
+            name_col = "location_name" if "location_name" in df.columns else "Location_Name"
             stop_labels = [
-                f"{df.loc[i, 'Location_Name']} ({i})" if "Location_Name" in df.columns else f"Stop {i}"
+                f"{df.loc[i, name_col]} ({i})" if name_col in df.columns and pd.notna(df.loc[i, name_col]) else f"Stop {i}"
                 for i in route_indices
             ]
 
