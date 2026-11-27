@@ -12,6 +12,13 @@ def create_model(csv_path = "stops.csv", num_vehicles = 1, vehicle_capacity = 5)
     data = {}
     #Read the actual csv of locations
     df = pd.read_csv(csv_path)
+    #Normalizing columns headers and flagging missing columns
+    df.columns = df.columns.str.strip().str.lower()
+    required = {"demand", "latitude", "longitude"}
+    if not required.issubset(df.columns):
+        raise ValueError(
+            f"Stops CSV is missing required columns. Needs: {required}"
+        )
 
     data["demands"] = df["Demand"].tolist()
 
