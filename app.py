@@ -80,6 +80,17 @@ if app_options == "Module 1: Vehicle Routing":
                         df_routes = pd.DataFrame(results.get("route_details")) 
                         st.dataframe(df_routes, use_container_width = True, hide_index = True)
 
+                        #Download button for vehicles
+                        route_text = "\n".join([f"Driver {r["Vehicle"]}: \nRoute: {r["Route"]} \nTotal Distance: {r["Distance (miles)"]} miles \n Total Load: {r["Load"]} units"
+                        for r in route_details
+                        ])
+                        st.download_button(
+                            label = "Download Driver Route Instruction (TXT)",
+                            data = route_text,
+                            file_name = "driver_route_instructions.txt",
+                            mime = "text/plain"
+                        )
+
                     st.subheader("Interactive Route Map")
                     map_file_path = results.get("map_file")   
 
@@ -98,7 +109,7 @@ if app_options == "Module 1: Vehicle Routing":
 
 if app_options == "Module 2: Packing Boxes Efficiently":
     st.header("Inventory and Box Packing Optimizer")
-    st.markdown("This tool helps maximize box capacity while ensuring every box has the neccessary items")
+    st.markdown("This tool helps maximize box capacity while ensuring every box has the necessary items")
     st.info("No exact ruler measurement are needed: assign relative size points in 'size_units'. For example: " \
     "1 = pouch, 3 = standard item, 6 = large blanket. Then, set 'Maximum Box Volume Capacity'.")
     st.sidebar.subheader("Data Input")

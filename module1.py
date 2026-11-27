@@ -4,6 +4,8 @@ from ortools.constraint_solver import routing_enums_pb2
 import pandas as pd
 import numpy as np
 import folium
+import time
+from geopy.geocoders import Nominatim
 
 #OR-tools needs to keep fractional miles
 SCALE = 10000
