@@ -4,3 +4,4 @@ pulp
 ortools
 folium
 highspy
+geopy
