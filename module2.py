@@ -5,6 +5,18 @@ def run_kitter(csv_path = "inventory.csv", box_volume_limit = 15):
     #Load in inventory.csv
     df = pd.read_csv(csv_path, comment = "#", skipinitialspace = True)
     #Define the problem first
+    df.columns = df.columns.str.strip().str.lower()
+    #Validate columns
+    required = {"item_id", "quantity_available", "size_units"}
+    if not required.issubset(df.columns):
+        missing = required - set(df.columns)
+        return {
+            "status": "Error",
+            "total_boxes": 0,
+            "manifest": {},
+            "error_msg": f"Missing required columns[s]: { ', '.join(missing)}"
+        }
+
     problem = pulp.LpProblem("Nonprofit_Optimization", pulp.LpMaximize)
 
     #Fill in missing optional columns with default values
