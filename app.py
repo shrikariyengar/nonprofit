@@ -19,7 +19,7 @@ session_dir = st.session_state.session_dir
 
 st.set_page_config(page_title = "Logistics Dashboard", layout = "wide")
 st.title("Logistics and Distribution Hub")
-st.markdown("Module 1 (Vehicle Routing) and Module 2 (Box Packing Optimization) - MUST FOLLOW GIVEN TEMPLATE FORMAT")
+st.markdown("Module 1 (Vehicle Routing) and Module 2 (Box Packing Optimization) - Template Formats are given in the side bar for each module!")
 st.divider()
 
 st.sidebar.header("Different Modes and Settings")
