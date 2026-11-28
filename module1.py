@@ -15,7 +15,7 @@ def geocode_addresses(df):
         return df
     geolocator = Nominatim(user_agent = "community_logistics_optimizer_v1")
     latitudes = []
-    longitude = []
+    longitudes = []
     for idx, row in df.iterrows():
         lat = row.get("latitude")
         lon = row.get("longitude")
@@ -29,16 +29,16 @@ def geocode_addresses(df):
                 try:
                     loc = geolocator.geocode(str(address))
                     if loc:
-                        lat, long = loc.latitude, loc.longitude
+                        lat, lon = loc.latitude, loc.longitude
                     else:
-                        lat, long = 0.0, 0.0
+                        lat, lon = 0.0, 0.0
                     time.sleep(1.1)
                 except Exception:
                     lat, lon = 0.0, 0.0
             latitudes.append(float(lat) if pd.notna(lat) else 0.0)
-            longitude.append(float(lat) if pd.notna(lat) else 0.0)
+            longitudes.append(float(lat) if pd.notna(lat) else 0.0)
     df["latitude"] = latitudes
-    df["longitude"] = longitude
+    df["longitude"] = longitudes
     return df
 #Bundles all the rules and matrix into the function create_model
 def create_model(csv_path = "stops.csv", num_vehicles = 1, vehicle_capacity = 5):
