@@ -83,7 +83,7 @@ def run_kitter(csv_path = "inventory.csv", box_volume_limit = 15):
         #Divide so it outputs per box (not total boxes)
         raw_qty = pulp.value(var)
         qty_packed = raw_qty if (has_solution and raw_qty is not None) else 0
-        per_box = int(qty_packed // total_boxes) if total_boxes > 0 else 0
+        per_box = int(round(qty_packed / total_boxes)) if total_boxes > 0 else 0
         print(f"{item_name}: {per_box} units per box")
         manifest[item_name] = per_box
 
