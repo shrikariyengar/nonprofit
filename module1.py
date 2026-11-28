@@ -36,7 +36,7 @@ def geocode_addresses(df):
                 except Exception:
                     lat, lon = 0.0, 0.0
             latitudes.append(float(lat) if pd.notna(lat) else 0.0)
-            longitudes.append(float(lat) if pd.notna(lat) else 0.0)
+            longitudes.append(float(lon) if pd.notna(lon) else 0.0)
     df["latitude"] = latitudes
     df["longitude"] = longitudes
     return df
@@ -48,10 +48,8 @@ def create_model(csv_path = "stops.csv", num_vehicles = 1, vehicle_capacity = 5)
     #Normalizing columns headers and flagging missing columns
     df.columns = df.columns.str.strip().str.lower()
     required = {"demand", "latitude", "longitude"}
-    if not required.issubset(df.columns):
-        raise ValueError(
-            f"Stops CSV is missing required columns. Needs: {required}"
-        )
+    if "demand" not in df.columns:
+        raise ValueError("Stops CSV is missing required column. Needs 'demand'")
     df = geocode_addresses(df)
     if "latitude" not in df.columns or "longitude" not in df.columns:
         raise ValueError(
