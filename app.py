@@ -81,7 +81,7 @@ if app_options == "Module 1: Vehicle Routing":
                         st.dataframe(df_routes, use_container_width = True, hide_index = True)
 
                         #Download button for vehicles
-                        route_text = "\n".join([f"Driver {r["Vehicle"]}: \nRoute: {r["Route"]} \nTotal Distance: {r["Distance (miles)"]} miles \n Total Load: {r["Load"]} units"
+                        route_text = "\n".join([f"Driver {r["Vehicle"]}: \nRoute: {r["Route"]} \nTotal Distance: {r["Distance (miles)"]} miles \n Total Load: {r["Load (units)"]} units"
                         for r in route_details
                         ])
                         st.download_button(
@@ -144,6 +144,7 @@ if app_options == "Module 2: Packing Boxes Efficiently":
         #Table
         st.subheader("Current Inventory Preview")
         df_preview = pd.read_csv(inventory_path, comment = "#", skipinitialspace = True)
+        df_preview.columns = df_preview.columns.str.strip().str.lower()
         st.dataframe(df_preview, use_container_width = True, hide_index = True)
 
         if st.button("Run Optimization", type = "primary", use_container_width = True):
